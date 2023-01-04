@@ -16,5 +16,7 @@ func main() {
 
 	MyMap = lemin.ValidateLinks(content[index:], MyMap)
 
-	fmt.Println(MyMap)
+	for k, v := range MyMap {
+		fmt.Println("key:", k, "\tvalue:", v)
+	}
 }
