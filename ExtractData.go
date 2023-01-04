@@ -68,64 +68,50 @@ func ValidateRooms(data []string) (Map, int) {
 	return MyMap, index
 }
 
-func ValidateLinks(Data []string, MyMap Map) Map {
-	//Check if all the called rooms exists
-	var Links string
-	AllLinks := make(map[string][]string)
+func ValidateLinks(data []string, myMap Map) Map {
+	// Check if all the called rooms exist
+	allLinks := make(map[string][]string)
+	links := make(map[string]struct{})
 
-	for _, item := range Data {
-		//separate the links by "-"
+	for _, item := range data {
 		temp := strings.Split(item, "-")
-		value, exists := AllLinks[temp[0]]
-		Duplicate := strings.Contains(strings.Join(value, ""), temp[1])
-
-		//the variable Links instantiates all unique rooms
-		//called within its respective block
-		if !strings.Contains(Links, temp[0]) {
-			Links += temp[0]
-		} else if Links != "" && !strings.Contains(Links, temp[1]) {
-			Links += temp[1]
+		if temp[0] == temp[1] {
+			log.Fatal("Room linking to itself")
 		}
-		//check whether the line contains a duplicated link to a specific room
-		//check if the room is linking to itself
-		if temp[0] == temp[1] || (exists && Duplicate) {
-			log.Fatal("Room linking to itself or Duplicate link to room found")
-		} else if !exists {
-			AllLinks[temp[0]] = []string{temp[1]}
-		} else {
-			value = append(value, temp[1])
+		if _, ok := allLinks[temp[0]]; ok {
+			for _, v := range allLinks[temp[0]] {
+				if v == temp[1] {
+					log.Fatal("Duplicate link to room found")
+				}
+			}
 		}
-
+		links[temp[0]] = struct{}{}
+		links[temp[1]] = struct{}{}
+		allLinks[temp[0]] = append(allLinks[temp[0]], temp[1])
 	}
 
-	for k := range MyMap {
-		if len(MyMap) != len(Links) {
-			log.Fatal("inexistant or missing room(s) have been detected within the block of links")
-		} else if strings.Contains(Links, k.Name) && len(MyMap) == len(Links) {
-			continue
-		} else {
-			log.Fatalf("Room %s Not found", k.Name)
+	// Check if all the rooms from the links block
+	// match the rooms collected from the rooms block
+	if len(myMap) != len(links) {
+		log.Fatal("Inexistant or missing room(s) detected within the block of links")
+	}
+
+	for k := range myMap {
+		if _, ok := links[k.Name]; !ok {
+			log.Fatalf("Room %s not found", k.Name)
 		}
+		items := allLinks[k.Name]
+		LinksBinder(k, items, myMap)
 	}
-	// DEFINITELY REQUIRES A FUNCTION WHICH WILL TAKE AS ARGUMENTS:
-	// K Room,
-	// multidimensional For loop, ranging over MyMap and AllLinks
-	// in order to bind rooms between themselves
-
-	for k := range MyMap {
-		items := AllLinks[k.Name]
-		LinksBinder(k, items, MyMap)
-	}
-	return MyMap
-
+	return myMap
 }
 
 func LinksBinder(Key Room, items []string, MyMap Map) {
-	value := MyMap[Key]
 	for _, v := range items {
 		for k := range MyMap {
 			if k.Name == v {
-				value = append(value, k)
+				MyMap[Key] = append(MyMap[Key], k)
+				break
 			}
 		}
 	}
