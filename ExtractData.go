@@ -8,13 +8,13 @@ import (
 
 var Start, End string = "##start", "##end"
 
-type Room struct {
+type Vertice struct {
 	Name  string
 	Start bool
 	End   bool
 }
 
-type Map map[Room][]Room
+type Map map[Vertice][]Vertice
 
 func ValidateAnts(data []string) int {
 	NumLine1, _ := strconv.Atoi(data[0])
@@ -27,36 +27,45 @@ func ValidateAnts(data []string) int {
 	return NumLine1
 }
 
-// Haven't handle '#' or 'L' Yet.
-// Did handle duplicates and Room which starts and ends.
-// Initiate a counter for start and end through a different function.
+/*
+Haven't handle '#' or 'L' Yet.
+Initiate a counter for start and end
+through a different function.
+*/
 func ValidateRooms(data []string) (Map, int) {
 	MyMap := make(Map)
 	var index int
 
 	for i := 1; i < len(data); i++ {
-
-		room := strings.Fields(data[i])
-		if len(room) == 3 {
-			Rooms := Room{Name: room[0]}
-			if _, exists := MyMap[Rooms]; exists {
-				log.Fatalf("Sorry, but room %s at line %d already exists", Rooms.Name, i+1)
+		// if room detected
+		if len(strings.Fields(data[i])) == 3 {
+			//normal room
+			_, normal := MyMap[Vertice{Name: strings.Fields(data[i])[0]}]
+			//start room
+			_, start := MyMap[Vertice{Name: strings.Fields(data[i])[0], Start: true}]
+			//end room
+			_, end := MyMap[Vertice{Name: strings.Fields(data[i])[0], End: true}]
+			if normal || start || end {
+				log.Fatalf("Sorry, but room %s at line %d already exists", strings.Fields(data[i])[0], i+1)
 			}
-			MyMap[Rooms] = nil
-		} else if data[i] == Start || data[i] == End {
+			//otherwise add it with empty value
+			MyMap[Vertice{Name: strings.Fields(data[i])[0]}] = nil
+		}
+		// if line == Start or End
+		if data[i] == Start || data[i] == End {
 			if len(strings.Fields(data[i+1])) != 3 {
 				log.Fatalf("Wrong format of inputted room: %s", (data[i+1]))
 			}
-			Rooms := Room{Name: strings.Fields(data[i+1])[0]}
+			Room := Vertice{Name: strings.Fields(data[i+1])[0]}
 			if data[i] == Start {
-				Rooms.Start = true
+				Room.Start = true
 			} else {
-				Rooms.End = true
+				Room.End = true
 			}
-			if _, exists := MyMap[Rooms]; exists {
-				log.Fatalf("Sorry, but room %s at line %d already exists", Rooms.Name, i+2)
+			if _, exists := MyMap[Room]; exists {
+				log.Fatalf("Sorry, but room %s at line %d already exists", Room.Name, i+2)
 			}
-			MyMap[Rooms] = nil
+			MyMap[Room] = nil
 			i++
 		}
 		if strings.Contains(data[i], "-") && len(strings.Fields(data[i])) == 1 {
@@ -106,7 +115,7 @@ func ValidateLinks(data []string, myMap Map) Map {
 	return myMap
 }
 
-func LinksBinder(Key Room, items []string, MyMap Map) {
+func LinksBinder(Key Vertice, items []string, MyMap Map) {
 	for _, v := range items {
 		for k := range MyMap {
 			if k.Name == v {
@@ -116,29 +125,3 @@ func LinksBinder(Key Room, items []string, MyMap Map) {
 		}
 	}
 }
-
-// // STEP 2:
-// func Validaterooms(Data []string, Starter int) (map[string][]string, int, int) {
-// 	var result map[string][]string
-// 	// Initialize a counter for ##start and ##end
-// 	Scounter, Ecounter := 0, 0
-// 	Sindex, Eindex := 0, 0
-// 	for i, v := range Data[Starter:] {
-// 		switch v {
-// 		case Start:
-// 			Scounter++
-// 			Sindex = i
-// 		case End:
-// 			Ecounter++
-// 			Eindex = i
-// 		}
-// 	}
-
-// else {
-// 		for _, v := range Data[Sindex : Eindex+2] {
-// 			result[v] = nil
-// 		}
-// 		//What if out of range?
-// 	}
-// 	return result, Sindex, Eindex
-// }
