@@ -68,6 +68,7 @@ func ValidateRooms(data []string) (Map, int) {
 			MyMap[Room] = nil
 			i++
 		}
+		//if 1st line of links block detected
 		if strings.Contains(data[i], "-") && len(strings.Fields(data[i])) == 1 {
 			index = i
 			break
@@ -120,6 +121,7 @@ func LinksBinder(Key Vertice, items []string, MyMap Map) {
 		for k := range MyMap {
 			if k.Name == v {
 				MyMap[Key] = append(MyMap[Key], k)
+				MyMap[k] = append(MyMap[k], Key)
 				break
 			}
 		}
