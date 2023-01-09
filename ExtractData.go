@@ -21,7 +21,7 @@ func ValidateAnts(data []string) int {
 	NumLine2, _ := strconv.Atoi(data[1])
 	if NumLine2 != 0 {
 		log.Fatalf("Invalid format of inputted ants at line 2")
-	} else if NumLine1 == 0 {
+	} else if NumLine1 <= 0 {
 		log.Fatalf("Not enough ants input to validate")
 	}
 	return NumLine1
@@ -78,7 +78,7 @@ func ValidateRooms(data []string) (Map, int) {
 	return MyMap, index
 }
 
-func ValidateLinks(data []string, myMap Map) Map {
+func ValidateLinks(data []string, MyMap *Map) Map {
 	// Check if all the called rooms exist
 	allLinks := make(map[string][]string)
 	links := make(map[string]struct{})
@@ -91,7 +91,7 @@ func ValidateLinks(data []string, myMap Map) Map {
 		if _, ok := allLinks[temp[0]]; ok {
 			for _, v := range allLinks[temp[0]] {
 				if v == temp[1] {
-					log.Fatal("Duplicate link to room found")
+					log.Fatalf("Found duplicate %s linked to room %s", v, temp[0])
 				}
 			}
 		}
@@ -102,18 +102,18 @@ func ValidateLinks(data []string, myMap Map) Map {
 
 	// Check if all the rooms from the links block
 	// match the rooms collected from the rooms block
-	if len(myMap) != len(links) {
+	if len(*MyMap) != len(links) {
 		log.Fatal("Inexistant or missing room(s) detected within the block of links")
 	}
 
-	for k := range myMap {
+	for k := range *MyMap {
 		if _, ok := links[k.Name]; !ok {
 			log.Fatalf("Room %s not found", k.Name)
 		}
 		items := allLinks[k.Name]
-		LinksBinder(k, items, myMap)
+		LinksBinder(k, items, *MyMap)
 	}
-	return myMap
+	return *MyMap
 }
 
 func LinksBinder(Key Vertice, items []string, MyMap Map) {
