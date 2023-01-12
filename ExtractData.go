@@ -9,12 +9,17 @@ import (
 var Start, End string = "##start", "##end"
 
 type Vertice struct {
-	Name  string
-	Start bool
-	End   bool
+	Name      string
+	Start     bool
+	End       bool
+	Neighbour []*Vertice
+	// Parents      []*Room
+	Vacant       bool
+	Visited      bool
+	CurrentLevel int
 }
 
-type Map map[Vertice][]Vertice
+type Map map[*Vertice][]Vertice
 
 func ValidateAnts(data []string) int {
 	NumLine1, _ := strconv.Atoi(data[0])
@@ -40,16 +45,16 @@ func ValidateRooms(data []string) (Map, int) {
 		// if room detected
 		if len(strings.Fields(data[i])) == 3 {
 			//normal room
-			_, normal := MyMap[Vertice{Name: strings.Fields(data[i])[0]}]
+			_, normal := MyMap[&Vertice{Name: strings.Fields(data[i])[0]}]
 			//start room
-			_, start := MyMap[Vertice{Name: strings.Fields(data[i])[0], Start: true}]
+			_, start := MyMap[&Vertice{Name: strings.Fields(data[i])[0], Start: true}]
 			//end room
-			_, end := MyMap[Vertice{Name: strings.Fields(data[i])[0], End: true}]
+			_, end := MyMap[&Vertice{Name: strings.Fields(data[i])[0], End: true}]
 			if normal || start || end {
 				log.Fatalf("Sorry, but room %s at line %d already exists", strings.Fields(data[i])[0], i+1)
 			}
 			//otherwise add it with empty value
-			MyMap[Vertice{Name: strings.Fields(data[i])[0]}] = nil
+			MyMap[&Vertice{Name: strings.Fields(data[i])[0]}] = nil
 		}
 		// if line == Start or End
 		if data[i] == Start || data[i] == End {
@@ -62,10 +67,10 @@ func ValidateRooms(data []string) (Map, int) {
 			} else {
 				Room.End = true
 			}
-			if _, exists := MyMap[Room]; exists {
+			if _, exists := MyMap[&Room]; exists {
 				log.Fatalf("Sorry, but room %s at line %d already exists", Room.Name, i+2)
 			}
-			MyMap[Room] = nil
+			MyMap[&Room] = nil
 			i++
 		}
 		//if 1st line of links block detected
@@ -111,17 +116,18 @@ func ValidateLinks(data []string, MyMap *Map) Map {
 			log.Fatalf("Room %s not found", k.Name)
 		}
 		items := allLinks[k.Name]
-		LinksBinder(k, items, *MyMap)
+		LinksBinder(k, items, MyMap)
 	}
 	return *MyMap
 }
 
-func LinksBinder(Key Vertice, items []string, MyMap Map) {
+func LinksBinder(Key *Vertice, items []string, MyMap *Map) {
+
 	for _, v := range items {
-		for k := range MyMap {
+		for k := range *MyMap {
 			if k.Name == v {
-				MyMap[Key] = append(MyMap[Key], k)
-				MyMap[k] = append(MyMap[k], Key)
+				Key.Neighbour = append(Key.Neighbour, k)
+				k.Neighbour = append(k.Neighbour, Key)
 				break
 			}
 		}
