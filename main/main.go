@@ -14,14 +14,23 @@ func main() {
 	content := strings.Split(string(data), "\n")
 	MyMap, index := lemin.ValidateRooms(content)
 	MyMap = lemin.ValidateLinks(content[index:], &MyMap)
-	//result := lemin.LinkedList(MyMap)
+	lemin.AdjustMap(&MyMap)
 
-	// fmt.Println("head: ", result.Head, "\t tail: ", result.Tail)
 	for k := range MyMap {
-		fmt.Print("key:", k)
-		for i, v := range k.Neighbour {
-			fmt.Println("neighbour num %d is: %v", i, *v)
+		fmt.Println(k.Name)
+		for _, p := range k.Parents {
+			fmt.Println("Parents: ", p.Name)
+		}
+		for _, c := range k.Children {
+			fmt.Println("Children: ", c.Name)
 		}
 		fmt.Println()
 	}
+	// for k := range MyMap {
+	// 	fmt.Printf("Room: %s\n", k.Name)
+	// 	for _, v := range k.Children {
+	// 		fmt.Println("Relative neighbour(s): ", *v)
+	// 	}
+	// 	fmt.Println()
+	// }
 }

@@ -8,18 +8,7 @@ import (
 
 var Start, End string = "##start", "##end"
 
-type Vertice struct {
-	Name      string
-	Start     bool
-	End       bool
-	Neighbour []*Vertice
-	// Parents      []*Room
-	Vacant       bool
-	Visited      bool
-	CurrentLevel int
-}
-
-type Map map[*Vertice][]Vertice
+type Map map[*Vertice]struct{}
 
 func ValidateAnts(data []string) int {
 	NumLine1, _ := strconv.Atoi(data[0])
@@ -54,7 +43,7 @@ func ValidateRooms(data []string) (Map, int) {
 				log.Fatalf("Sorry, but room %s at line %d already exists", strings.Fields(data[i])[0], i+1)
 			}
 			//otherwise add it with empty value
-			MyMap[&Vertice{Name: strings.Fields(data[i])[0]}] = nil
+			MyMap[&Vertice{Name: strings.Fields(data[i])[0]}] = struct{}{}
 		}
 		// if line == Start or End
 		if data[i] == Start || data[i] == End {
@@ -70,7 +59,7 @@ func ValidateRooms(data []string) (Map, int) {
 			if _, exists := MyMap[&Room]; exists {
 				log.Fatalf("Sorry, but room %s at line %d already exists", Room.Name, i+2)
 			}
-			MyMap[&Room] = nil
+			MyMap[&Room] = struct{}{}
 			i++
 		}
 		//if 1st line of links block detected
@@ -126,8 +115,8 @@ func LinksBinder(Key *Vertice, items []string, MyMap *Map) {
 	for _, v := range items {
 		for k := range *MyMap {
 			if k.Name == v {
-				Key.Neighbour = append(Key.Neighbour, k)
-				k.Neighbour = append(k.Neighbour, Key)
+				Key.Children = append(Key.Children, k)
+				k.Children = append(k.Children, Key)
 				break
 			}
 		}
