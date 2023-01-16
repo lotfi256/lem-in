@@ -1,8 +1,11 @@
 package lemin
 
-// Maybe will use an array of []struct
-// to store collected rooms and link them together
-// with a []*Vertice field
+import (
+	"sync"
+)
+
+var wg sync.WaitGroup
+
 type Vertice struct {
 	Name         string
 	Start        bool
@@ -30,37 +33,51 @@ func AdjustMap(MyMap *Map) {
 		if key.Start {
 			//the starting point will always be Tail
 			//Head will move across the map
-			Result.Tail = key
+			Result.Tail, Result.Head = key, key
 		}
 		if key.End {
-			Result.Head = key
 			key.Parents = key.Children
 			key.Children = nil
 		}
 	}
-	for Result.Tail.Children != nil {
-		LinkedList(Result.Tail)
-	}
+	LinkedList(Result.Head)
 }
 
-// maybe use a go routine
-// To wait for each function to finish
-
-// or maybe loop over the unvisited nodes
+// Should implement the level system (increment it by 1 for each edge between it and start)
 func LinkedList(Node *Vertice) {
-	Node.Visited = true
 	for _, v := range Node.Children {
-		if !v.End && !v.Visited {
-			v.Parents = append(v.Parents, Node)
-			for index, item := range v.Children {
-				if item.Name == Node.Name {
-					v.Children = append(v.Children[:index], v.Children[index+1:]...)
-				}
-			}
-		} else {
-			break
+
+		if v.End {
+			continue
 		}
-		LinkedList(v)
+		//add the parent node to the child
+		//only if it doesn't already exist
+		// for I, P := range v.Parents {
+		// 	if P == Node {
+		// 		break
+		// 	}
+		// 	if I == (len(v.Parents)-1) && P != Node {
+		v.Parents = append(v.Parents, Node)
+		// 	}
+		// }
+
+		//remove the Parent node from the LinkedList
+		for index, item := range v.Children {
+			if item.Name == Node.Name && index != len(v.Children)-1 {
+				v.Children = append(v.Children[:index], v.Children[index+1:]...)
+			} else if item.Name == Node.Name && index == len(v.Children)-1 {
+				v.Children = v.Children[:index]
+			}
+		}
+		Result.Head = v
+		wg.Add(1)
+		go LinkedList(Result.Head)
+		//repeat for each child node at Result.Head
+		defer wg.Done()
+
+		// if !v.End && v.Children == nil {
+		// 	delete(MyMap[v])
+		// }
 	}
 }
 
