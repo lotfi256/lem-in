@@ -33,6 +33,7 @@ func ValidateRooms(data []string) (Map, int) {
 	for i := 1; i < len(data); i++ {
 		// if room detected
 		if len(strings.Fields(data[i])) == 3 {
+
 			//normal room
 			_, normal := MyMap[&Vertice{Name: strings.Fields(data[i])[0]}]
 			//start room
@@ -115,8 +116,8 @@ func LinksBinder(Key *Vertice, items []string, MyMap *Map) {
 	for _, v := range items {
 		for k := range *MyMap {
 			if k.Name == v {
-				Key.Children = append(Key.Children, k)
-				k.Children = append(k.Children, Key)
+				Key.Links = append(Key.Links, k)
+				k.Links = append(k.Links, Key)
 				break
 			}
 		}

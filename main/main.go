@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+var Route []lemin.Vertice
 var filename string = os.Args[1]
 
 func main() {
@@ -14,23 +15,26 @@ func main() {
 	content := strings.Split(string(data), "\n")
 	MyMap, index := lemin.ValidateRooms(content)
 	MyMap = lemin.ValidateLinks(content[index:], &MyMap)
-	lemin.AdjustMap(&MyMap)
 
 	for k := range MyMap {
-		fmt.Println(k.Name)
-		for _, p := range k.Parents {
-			fmt.Println("Parents: ", p.Name)
+		if k.Start {
+			lemin.RecursivePathFinder(k, Route)
 		}
-		for _, c := range k.Children {
-			fmt.Println("Children: ", c.Name)
+	}
+
+	for _, v := range lemin.AllPaths {
+		for i, item := range v {
+			fmt.Print("  Move ", i+1, ":  ", item.Name)
 		}
 		fmt.Println()
 	}
+
 	// for k := range MyMap {
-	// 	fmt.Printf("Room: %s\n", k.Name)
-	// 	for _, v := range k.Children {
-	// 		fmt.Println("Relative neighbour(s): ", *v)
+	// 	fmt.Println(k.Name)
+	// 	for _, c := range k.Links {
+	// 		fmt.Println("Links: ", c.Name)
 	// 	}
 	// 	fmt.Println()
 	// }
+
 }
