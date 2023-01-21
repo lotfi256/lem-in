@@ -22,9 +22,33 @@ func main() {
 		}
 	}
 
-	for _, v := range lemin.AllPaths {
-		for i, item := range v {
-			fmt.Print("  Move ", i+1, ":  ", item.Name)
+	// fmt.Println(len(lemin.AllPaths))
+	// for _, v := range lemin.AllPaths {
+	// 	for i, item := range v {
+	// 		fmt.Printf("Turn %d: %s\n", i+1, item.Name)
+	// 	}
+	// 	fmt.Println()
+	// 	fmt.Println()
+	// }
+	Result := lemin.ChoosePath(lemin.CombinePaths(lemin.AllPaths))
+
+	// for i, v := range Result {
+	// 	fmt.Printf("MaxFlow %d: ", i+1)
+	// 	for I, element := range v {
+	// 		fmt.Println("\nPath ", I+1, ":")
+	// 		for index, item := range element {
+	// 			fmt.Printf("Turn %d: %s\t", index+1, item.Name)
+	// 		}
+	// 		fmt.Println()
+	// 	}
+	// 	fmt.Println()
+	// 	fmt.Println()
+	// }
+
+	for i, v := range Result {
+		fmt.Println("\nPath ", i+1, ":")
+		for index, item := range v {
+			fmt.Printf("Node %d: %s  ", index+1, item.Name)
 		}
 		fmt.Println()
 	}
@@ -36,5 +60,4 @@ func main() {
 	// 	}
 	// 	fmt.Println()
 	// }
-
 }
