@@ -1,8 +1,9 @@
 package lemin
 
-import "reflect"
-
-//var wg sync.WaitGroup
+import (
+	"reflect"
+	"sort"
+)
 
 type Vertice struct {
 	Name  string
@@ -17,10 +18,8 @@ type Vertice struct {
 
 var AllPaths [][]Vertice
 
-// STEP 1: Get all possible paths
+// STEP 1: Get all possible combinations of paths
 func RecursivePathFinder(Node *Vertice, route []Vertice) {
-	//to be reinvented
-	//TRY TO DEBUG
 	if Node.End {
 		route = append(route, *Node)
 		AllPaths = append(AllPaths, route)
@@ -35,14 +34,6 @@ func RecursivePathFinder(Node *Vertice, route []Vertice) {
 		RecursivePathFinder(v, route)
 	}
 }
-
-// func PathFinder(MyMap *Map) [][]*Vertice {
-// 	var result [][]*Vertice
-// 	var Path []*Vertice
-
-// }
-
-//STEP 2: Find Maximum Flow
 
 // find all combinations of unique paths
 func CombinePaths(AllPaths [][]Vertice) [][][]Vertice {
@@ -83,11 +74,11 @@ func CombinePaths(AllPaths [][]Vertice) [][][]Vertice {
 	return Result
 }
 
+// STEP 2: Find the Maximum Flow
 func ChoosePath(CombPaths [][][]Vertice) [][]Vertice {
 	var Max int
 	var Sum int
 	var Index int
-	//Pick the highest max flow
 
 	//Start by finding the highest amount of flow
 	for i, j := 0, len(CombPaths)-1; i < j; i, j = i+1, j-1 {
@@ -114,7 +105,11 @@ func ChoosePath(CombPaths [][][]Vertice) [][]Vertice {
 	return CombPaths[Index]
 }
 
-//STEP 3: queue the ants using edmonds-karp method
+// STEP 3: queue the ants using edmonds-karp method
+func QueueThem(Ants int, MaxFlow [][]Vertice) {
+	//Sort them from shortest to longest
+	sort.Slice(MaxFlow[:], func(i, j int) bool { return len(MaxFlow[j]) > len(MaxFlow[i]) })
+}
 
 func inArray(s []Vertice, vp Vertice) (result bool) {
 	for _, v := range s {
