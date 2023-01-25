@@ -23,6 +23,7 @@ func main() {
 			lemin.RecursivePathFinder(k, Route)
 		}
 	}
+
 	Result := lemin.ChoosePath(lemin.CombinePaths(lemin.AllPaths))
 
 	for i, v := range Result {
@@ -32,4 +33,12 @@ func main() {
 		}
 		fmt.Println()
 	}
+	// for i, v := range lemin.AllPaths {
+	// 	fmt.Println("Path ", i+1, ":")
+	// 	for index, element := range v {
+	// 		fmt.Println("Node ", index+1, " is ", element.Name)
+	// 	}
+	// 	fmt.Println()
+
+	// }
 }

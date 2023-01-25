@@ -5,31 +5,33 @@ import (
 	"sort"
 )
 
+var AllPaths [][]Vertice
+
 type Vertice struct {
-	Name  string
-	Start bool
-	End   bool
-	Links []*Vertice
-	// Parents      []*Vertice
+	Name         string
+	Start        bool
+	End          bool
+	Links        []*Vertice
 	Vacant       bool
 	Visited      bool
 	CurrentLevel int
 }
 
-var AllPaths [][]Vertice
-
 // STEP 1: Get all possible combinations of paths
 func RecursivePathFinder(Node *Vertice, route []Vertice) {
 	if Node.End {
 		route = append(route, *Node)
-		AllPaths = append(AllPaths, route)
+		sepRoute := make([]Vertice, len(route))
+		copy(sepRoute, route)
+		AllPaths = append(AllPaths, sepRoute)
 		return
+	} else {
+		if inArray(route, *Node) {
+			return
+		}
+		route = append(route, *Node)
 	}
 
-	if inArray(route, *Node) {
-		return
-	}
-	route = append(route, *Node)
 	for _, v := range Node.Links {
 		RecursivePathFinder(v, route)
 	}
@@ -37,7 +39,7 @@ func RecursivePathFinder(Node *Vertice, route []Vertice) {
 
 // find all combinations of unique paths
 func CombinePaths(AllPaths [][]Vertice) [][][]Vertice {
-	//THE UGLIEST FUNCTION I HAVE EVER CREATED
+	//THE UGLIEST FUNCTION I HAVE EVER WRITTEN
 
 	Result := make([][][]Vertice, 0)
 	MaxFlow := make([][]Vertice, 0)
@@ -90,18 +92,30 @@ func ChoosePath(CombPaths [][][]Vertice) [][]Vertice {
 	}
 	//If several paths share the same amount of flow
 	//then choose the shortest one
+
+	//to be redone
+	temp := 0
 	for I, P := range CombPaths {
-		temp := 0
+
 		if len(P) == Max {
 			for i, path := range P {
-				temp += len(path)
-				if i == len(P)-1 && temp > Sum {
-					Index = I
+
+				Sum += len(path)
+				if i == len(P)-1 {
+					if temp == 0 {
+						Index = I
+						temp = Sum
+					} else if Sum <= temp {
+						Index = I
+						temp = Sum
+					}
+					Sum = 0
+
 				}
 			}
 		}
-	}
 
+	}
 	return CombPaths[Index]
 }
 
