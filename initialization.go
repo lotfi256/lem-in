@@ -1,20 +1,22 @@
 package lemin
 
 import (
+	"fmt"
+	"log"
 	"reflect"
 	"sort"
+	"strconv"
 )
 
 var AllPaths [][]Vertice
 
 type Vertice struct {
-	Name         string
-	Start        bool
-	End          bool
-	Links        []*Vertice
-	Vacant       bool
-	Visited      bool
-	CurrentLevel int
+	Name    string
+	Start   bool
+	End     bool
+	Links   []*Vertice
+	Vacant  bool
+	Visited bool
 }
 
 // STEP 1: Get all possible combinations of paths
@@ -40,6 +42,9 @@ func RecursivePathFinder(Node *Vertice, route []Vertice) {
 // find all combinations of unique paths
 func CombinePaths(AllPaths [][]Vertice) [][][]Vertice {
 	//THE UGLIEST FUNCTION I HAVE EVER WRITTEN
+	if len(AllPaths) == 0 {
+		log.Fatal("no path found from start to end")
+	}
 
 	Result := make([][][]Vertice, 0)
 	MaxFlow := make([][]Vertice, 0)
@@ -90,10 +95,9 @@ func ChoosePath(CombPaths [][][]Vertice) [][]Vertice {
 			Max = len(CombPaths[j])
 		}
 	}
+
 	//If several paths share the same amount of flow
 	//then choose the shortest one
-
-	//to be redone
 	temp := 0
 	for I, P := range CombPaths {
 
@@ -120,9 +124,50 @@ func ChoosePath(CombPaths [][][]Vertice) [][]Vertice {
 }
 
 // STEP 3: queue the ants using edmonds-karp method
-func QueueThem(Ants int, MaxFlow [][]Vertice) {
+func QueueThem(NumAnts int, MaxFlow [][]Vertice) {
 	//Sort them from shortest to longest
-	sort.Slice(MaxFlow[:], func(i, j int) bool { return len(MaxFlow[j]) > len(MaxFlow[i]) })
+	sort.Slice(MaxFlow, func(i, j int) bool { return len(MaxFlow[j]) > len(MaxFlow[i]) })
+
+	//start queuing them using edmonds-karp
+	QueuedAnts := make([][]string, len(MaxFlow))
+
+	//here, we are adding all ants to the only path we have
+	//hence why len(MaxFlow) would be 1
+	if len(MaxFlow) == 1 {
+		for i := 1; i <= NumAnts; i++ {
+			AntName := "L" + strconv.Itoa(i)
+			QueuedAnts[0] = append(QueuedAnts[0], AntName)
+		}
+	} else {
+		for i := 1; i <= NumAnts; i++ {
+			AntName := "L" + strconv.Itoa(i)
+			//after adding an ant to the queue
+			//we need to decide which path does it
+			//correspond to
+			for j := 0; j < len(MaxFlow); j++ {
+				if j < len(MaxFlow)-1 {
+					PathSize1 := len(MaxFlow[j]) + len(QueuedAnts[j])
+					PathSize2 := len(MaxFlow[j+1]) + len(QueuedAnts[j+1])
+					if PathSize1 <= PathSize2 {
+						QueuedAnts[j] = append(QueuedAnts[j], AntName)
+						break
+					}
+				} else if j == len(MaxFlow)-1 {
+					QueuedAnts[j] = append(QueuedAnts[j], AntName)
+				}
+
+			}
+		}
+
+	}
+	for i, v := range QueuedAnts {
+		fmt.Println("Path ", i+1, ": ", v)
+	}
+
+}
+
+func PrintResult() {
+
 }
 
 func inArray(s []Vertice, vp Vertice) (result bool) {

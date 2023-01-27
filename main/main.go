@@ -14,8 +14,11 @@ var NumberAnts int
 func main() {
 	data, _ := os.ReadFile(filename)
 	content := strings.Split(string(data), "\n")
+
 	NumberAnts = lemin.ValidateAnts(content)
+
 	MyMap, index := lemin.ValidateRooms(content)
+
 	MyMap = lemin.ValidateLinks(content[index:], &MyMap)
 
 	for k := range MyMap {
@@ -25,6 +28,7 @@ func main() {
 	}
 
 	Result := lemin.ChoosePath(lemin.CombinePaths(lemin.AllPaths))
+	lemin.QueueThem(NumberAnts, Result)
 
 	for i, v := range Result {
 		fmt.Println("\nPath ", i+1, ":")
