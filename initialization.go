@@ -166,7 +166,30 @@ func QueueThem(NumAnts int, MaxFlow [][]Vertice) {
 
 }
 
-func PrintResult() {
+func PrintResult(QueuedAnts [][]string, MaxFlow [][]Vertice) {
+	//each ant must travel from
+	//start to end simultaneously
+
+	//Print Turn 1:
+	//Print Turn 2:
+	//...
+	//...
+	//Print Turn N:
+
+	// Should maybe create a map[string]int
+	// string represent the ants as keys
+	// int to keep track of their pathing until end is reached
+
+	// initialize the ants from the queue one by one,
+	//([]string and delete elements that reached the end)
+	// by incrementing the index from QueuedAnts
+
+	// Maybe variadic function?
+	// at each For-loop, add an ant to the starting point
+
+	// for _, Path := range MaxFlow {
+	// 	//Recursive for each ant L inside QueuedAnts until all reach Node.End?
+	// }
 
 }
 
