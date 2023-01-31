@@ -39,6 +39,7 @@ func RecursivePathFinder(Node *Vertice, route []Vertice) {
 	}
 }
 
+// Hello world
 // find all combinations of unique paths
 func CombinePaths(AllPaths [][]Vertice) [][][]Vertice {
 	//THE UGLIEST FUNCTION I HAVE EVER WRITTEN
@@ -47,16 +48,16 @@ func CombinePaths(AllPaths [][]Vertice) [][][]Vertice {
 	}
 
 	Result := make([][][]Vertice, 0)
-	MaxFlow := make([][]Vertice, 0)
+	CombPaths := make([][]Vertice, 0)
 	var counter int
-	var Breaker bool = false
+	var Breaker bool
 
 	for _, P1 := range AllPaths {
 		//compare 1 Path with all other Paths
-		MaxFlow = append(MaxFlow, P1)
+		CombPaths = append(CombPaths, P1)
 		for _, P2 := range AllPaths {
 			//compare the Paths node by node.
-			for i, P := range MaxFlow {
+			for i, P := range CombPaths {
 				if !Breaker {
 					for _, v := range P[1 : len(P)-1] {
 						if inArray(P2[1:len(P2)-1], v) {
@@ -65,18 +66,18 @@ func CombinePaths(AllPaths [][]Vertice) [][][]Vertice {
 						}
 					}
 				}
-				if i == len(MaxFlow)-1 && !Breaker {
-					MaxFlow = append(MaxFlow, P2)
+				if i == len(CombPaths)-1 && !Breaker {
+					CombPaths = append(CombPaths, P2)
 				}
 			}
 			Breaker = false
 		}
-		if counter <= len(MaxFlow) {
-			Result = append(Result, MaxFlow)
-			counter = len(MaxFlow)
+		if counter <= len(CombPaths) {
+			Result = append(Result, CombPaths)
+			counter = len(CombPaths)
 		}
 
-		MaxFlow = nil
+		CombPaths = nil
 	}
 	return Result
 }
@@ -167,6 +168,16 @@ func QueueThem(NumAnts int, MaxFlow [][]Vertice) {
 }
 
 func PrintResult(QueuedAnts [][]string, MaxFlow [][]Vertice) {
+	// func printResult(ants []Ant) {
+	// 	for i := 0; i < len(ants[0].positions); i++ {
+	// 		line := ""
+	// 		for j := 0; j < len(ants); j++ {
+	// 			line += "L" + strconv.Itoa(j+1) + "-" + strconv.Itoa(ants[j].positions[i]) + " "
+	// 		}
+	// 		fmt.Println(strings.TrimRight(line, " "))
+	// 	}
+	}
+
 	//each ant must travel from
 	//start to end simultaneously
 
