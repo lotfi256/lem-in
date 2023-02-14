@@ -12,7 +12,10 @@ var filename string = os.Args[1]
 var NumberAnts int
 
 func main() {
-	data, _ := os.ReadFile(filename)
+	//data, _ := os.ReadFile(filename)
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+	  log.Errorf(err)
 	content := strings.Split(string(data), "\n")
 
 	NumberAnts = lemin.ValidateAnts(content)
